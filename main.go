@@ -2,10 +2,12 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/jtslear/expert-octo-train/mapper"
 	"io"
 	"log"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -68,7 +70,18 @@ func getPlaces(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+  if os.Getenv("OPENSHIFT_GO_IP") == "" {
+    os.Setenv("OPENSHIFT_GO_IP", "127.0.0.1")
+  }
+  if os.Getenv("OPENSHIFT_GO_PORT") == "" {
+    os.Setenv("OPENSHIFT_GO_PORT", "5000")
+  }
+	bind := fmt.Sprintf("%s:%s", os.Getenv("OPENSHIFT_GO_IP"), os.Getenv("OPENSHIFT_GO_PORT"))
+	fmt.Printf("listening on %s...\n", bind)
 	http.HandleFunc("/healthcheck", healthcheck)
 	http.HandleFunc("/", getPlaces)
-	http.ListenAndServe(":8000", Log(http.DefaultServeMux))
+  err := http.ListenAndServe(bind, Log(http.DefaultServeMux))
+	if err != nil {
+		panic(err)
+	}
 }
