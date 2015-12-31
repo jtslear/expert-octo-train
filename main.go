@@ -53,10 +53,6 @@ func getPlaces(allTheThings Choices) http.HandlerFunc {
 }
 
 func main() {
-	err := httpService.StartServer()
-	if err != nil {
-		panic(err)
-	}
 
 	seed := []string{
 		"New York City, NY",
@@ -69,5 +65,10 @@ func main() {
 
 	http.HandleFunc("/healthcheck", healthcheck)
 	http.HandleFunc("/", getPlaces(result))
+
+	err := httpService.StartServer()
+	if err != nil {
+		panic(err)
+	}
 
 }
